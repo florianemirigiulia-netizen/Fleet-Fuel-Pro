@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Fleet Fuel Pro</title>
+<meta name="theme-color" content="#0f172a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Fleet Fuel">
+<link id="appleIcon" rel="apple-touch-icon">
+<link id="pwaManifest" rel="manifest">
+<style>
+*{box-sizing:border-box;font-family:system-ui,-apple-system,sans-serif;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:#f1f5f9;padding:12px;padding-bottom:105px;user-select:none;color:#0f172a}
+h1{font-size:21px;text-align:center;margin:8px 0 4px}
+h2{font-size:16px;margin:0 0 8px}
+.sub{text-align:center;color:#64748b;font-size:13px;margin-bottom:12px}
+.card{background:#fff;border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+label{font-size:13px;color:#475569;display:block;margin-top:10px;font-weight:600}
+input,select{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:10px;margin-top:4px;font-size:16px;background:#fff;user-select:text}
+input:focus,select:focus{outline:none;border-color:#2563eb}
+input[type="checkbox"]{width:20px;height:20px;margin:0;accent-color:#16a34a}
+.check-row{display:flex;align-items:center;gap:10px;margin-top:12px;padding:10px;background:#f8fafc;border-radius:10px;border:1px solid #e2e8f0;cursor:pointer}
+.check-row span{font-size:14px;font-weight:700;color:#0f172a}
+.check-row small{display:block;font-size:12px;color:#64748b;font-weight:400}
+button{width:100%;padding:13px;border:0;border-radius:12px;font-size:15px;font-weight:700;margin-top:10px;cursor:pointer}
+button:active{transform:scale(.99)}
+.btn-black{background:#0f172a;color:#fff}
+.btn-green{background:#16a34a;color:#fff}
+.btn-wa{background:#25d366;color:#0f172a}
+.btn-blue{background:#2563eb;color:#fff}
+.btn-orange{background:#ea580c;color:#fff}
+.btn-red{background:#dc2626;color:#fff}
+.btn-yellow{background:#facc15;color:#0f172a}
+.btn-sm{width:auto;padding:6px 10px;font-size:12px;border-radius:8px;margin:0}
+.row{display:flex;gap:8px}.row>*{flex:1}
+.stat{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;padding:10px 0;border-bottom:1px solid #f1f5f9;font-size:14px}
+.stat:last-child{border-bottom:0}
+.kpi{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.kpi div{background:#0f172a;color:#fff;border-radius:14px;padding:12px}
+.kpi small{opacity:.8;font-size:12px}.kpi b{font-size:20px;display:block;margin-top:2px}
+.badge{background:#fef9c3;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:800;color:#854d0e;display:inline-block}
+.badge-green{background:#dcfce7;color:#166534}
+.badge-blue{background:#dbeafe;color:#1e40af}
+.badge-red{background:#fee2e2;color:#991b1b}
+.badge-orange{background:#ffedd5;color:#9a3412}
+img{width:100%;border-radius:10px;margin-top:8px;max-height:220px;object-fit:cover}
+.tabbar{position:fixed;bottom:0;left:0;right:0;background:#fff;display:flex;border-top:1px solid #e2e8f0;padding:6px 4px env(safe-area-inset-bottom,6px);z-index:10;box-shadow:0 -2px 10px rgba(0,0,0,.04)}
+.tabbar button{position:relative;background:none;color:#64748b;font-size:11px;padding:6px 2px;margin:0;border-radius:10px;display:flex;flex-direction:column;align-items:center;gap:3px}
+.tabbar button.active{color:#0f172a;background:#f1f5f9}
+.tabbar button span.ico{font-size:18px;line-height:1}
+.dot{position:absolute;top:4px;right:18%;background:#dc2626;color:#fff;font-size:10px;font-weight:800;padding:1px 5px;border-radius:10px;display:none}
+.view{display:none}.view.active{display:block}
+.empty{text-align:center;color:#94a3b8;padding:24px 12px;font-size:14px}
+.offline-pill{display:inline-block;font-size:11px;padding:2px 8px;border-radius:12px;background:#dcfce7;color:#166534;font-weight:700;margin-left:6px}
+</style>
+</head>
+<body>
+
+<h1>⛽ Fleet Fuel Pro <span id="offlineStatus" class="offline-pill">Online</span></h1>
+<div class="sub">Gestione Rifornimenti, Consumi & Scadenze</div>
+
+<div id="view-add" class="view active">
+  <div class="card">
+    <h2>Nuovo Rifornimento</h2>
+    <label>Veicolo *</label>
+    <select id="fVehicle"></select>
+
+    <div class="row">
+      <div>
+        <label>Data *</label>
+        <input type="date" id="fDate">
+      </div>
+      <div>
+        <label>Chilometri attuali *</label>
+        <input type="number" id="fKm" placeholder="es. 45200" inputmode="numeric">
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>Litri *</label>
+        <input type="number" id="fLiters" step="0.01" placeholder="es. 42.50" inputmode="decimal">
+      </div>
+      <div>
+        <label>Prezzo €/L</label>
+        <input type="number" id="fPrice" step="0.001" placeholder="es. 1.789" inputmode="decimal">
+      </div>
+    </div>
+
+    <label>Importo Totale (€) *</label>
+    <input type="number" id="fTotal" step="0.01" placeholder="Calcolato o manuale" inputmode="decimal">
+
+    <label class="check-row">
+      <input type="checkbox" id="fFull" checked>
+      <div>
+        <span>Pieno completo</span>
+        <small>Necessario per calcolare la media km/l esatta</small>
+      </div>
+    </label>
+
+    <label>Autista / Note</label>
+    <input type="text" id="fNote" placeholder="Nome autista o distributore">
+
+    <label>Foto Scontrino (opzionale)</label>
+    <input type="file" id="fPhoto" accept="image/*" capture="environment">
+    <img id="previewImg" style="display:none" alt="Anteprima scontrino">
+
+    <button class="btn-green" onclick="saveFuel()">💾 Salva Rifornimento</button>
+    <button class="btn-wa" onclick="saveFuel(true)">📲 Salva e Invia su WhatsApp</button>
+  </div>
+</div>
+
+<div id="view-history" class="view">
+  <div class="card">
+    <label style="margin-top:0">Filtra per Veicolo</label>
+    <select id="filterVehicle" onchange="renderHistory()"></select>
+  </div>
+  <div id="historyList"></div>
+</div>
+
+<div id="view-deadlines" class="view">
+  <div class="card">
+    <h2>Nuova Scadenza / Manutenzione</h2>
+    <label>Veicolo *</label>
+    <select id="dVehicle"></select>
+
+    <div class="row">
+      <div>
+        <label>Tipo Scadenza *</label>
+        <select id="dType">
+          <option value="Assicurazione">Assicurazione</option>
+          <option value="Bollo">Bollo</option>
+          <option value="Revisione">Revisione</option>
+          <option value="Tagliando">Tagliando</option>
+          <option value="Gomme">Cambio Gomme</option>
+          <option value="Altro">Altro</option>
+        </select>
+      </div>
+      <div>
+        <label>Data Scadenza *</label>
+        <input type="date" id="dDate">
+      </div>
+    </div>
+
+    <label>Note o Km previsti (opzionale)</label>
+    <input type="text" id="dNote" placeholder="es. Scadenza polizza o tagliando 60.000 km">
+
+    <button class="btn-blue" onclick="addDeadline()">🔔 Salva Scadenza</button>
+  </div>
+
+  <div class="card">
+    <h2>Scadenzario Flotta</h2>
+    <div id="deadlineList"></div>
+  </div>
+</div>
+
+<div id="view-stats" class="view">
+  <div class="kpi">
+    <div><small>Spesa Totale</small><b id="kpiCost">€ 0,00</b></div>
+    <div><small>Litri Erogati</small><b id="kpiLiters">0,0 L</b></div>
+    <div><small>Media Flotta</small><b id="kpiAvg">-- km/l</b></div>
+    <div><small>Rifornimenti</small><b id="kpiCount">0</b></div>
+  </div>
+
+  <div class="card">
+    <h2>Riepilogo per Veicolo</h2>
+    <div id="vehicleStats"></div>
+  </div>
+
+  <div class="card">
+    <h2>Esporta Dati</h2>
+    <button class="btn-blue" onclick="exportCSV()">📊 Scarica Report Excel (CSV)</button>
+    <button class="btn-wa" onclick="shareSummaryWA()">📲 Condividi Riepilogo WhatsApp</button>
+  </div>
+</div>
+
+<div id="view-vehicles" class="view">
+  <div class="card">
+    <h2>Aggiungi Veicolo</h2>
+    <label>Targa *</label>
+    <input type="text" id="vPlate" placeholder="es. AB 123 CD" style="text-transform:uppercase">
+    <label>Modello / Descrizione *</label>
+    <input type="text" id="vModel" placeholder="es. Fiat Ducato Maxi">
+    <label>Carburante</label>
+    <select id="vFuel">
+      <option value="Diesel">Diesel</option>
+      <option value="Benzina">Benzina</option>
+      <option value="GPL">GPL</option>
+      <option value="Metano">Metano</option>
+      <option value="AdBlue">AdBlue</option>
+    </select>
+    <button class="btn-black" onclick="addVehicle()">➕ Aggiungi Veicolo</button>
+  </div>
+
+  <div class="card">
+    <h2>Flotta Attiva</h2>
+    <div id="vehicleList"></div>
+  </div>
+
+  <div class="card">
+    <h2>Backup, Ripristino & Reset</h2>
+    <button class="btn-orange" onclick="backupJSON()">📥 Esporta Backup JSON</button>
+    <button class="btn-yellow" onclick="document.getElementById('restoreInput').click()">📤 Ripristina Backup JSON</button>
+    <input type="file" id="restoreInput" accept=".json,application/json" style="display:none" onchange="restoreJSON(event)">
+    <button class="btn-red" onclick="resetAll()">🗑️ Cancella Tutti i Dati</button>
+  </div>
+</div>
+
+<nav class="tabbar">
+  <button class="active" onclick="switchTab('add', this)"><span class="ico">⛽</span>Rifornisci</button>
+  <button onclick="switchTab('history', this)"><span class="ico">📋</span>Storico</button>
+  <button onclick="switchTab('deadlines', this)"><span class="ico">🔔</span>Scadenze<span id="alertDot" class="dot">0</span></button>
+  <button onclick="switchTab('stats', this)"><span class="ico">📊</span>Report</button>
+  <button onclick="switchTab('vehicles', this)"><span class="ico">🚚</span>Veicoli</button>
+</nav>
+
+<script>
+(function initPWA() {
+  const svgIcon = `<svg xmlns="http://w3.org" viewBox="0 0 512 512"><rect width="512" height="512" rx="110" fill="#0f172a"/><text x="50%" y="54%" font-size="260" text-anchor="middle" dominant-baseline="middle">⛽</text></svg>`;
